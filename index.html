@@ -70,6 +70,8 @@ button.danger { color: var(--red); border-color: var(--red); }
 .cell.missing { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--red-soft) 5px 7px); }
 /* Readings of rare characters run down the right side of the character, as in textbooks. */
 .cell.has-reading { justify-content: flex-start; padding-left: calc(var(--cell) * .06); font-size: calc(var(--cell) * .56); }
+.no-readings .cell.has-reading { justify-content: center; padding-left: 0; font-size: calc(var(--cell) * .62); }
+.no-readings .cell .reading { display: none; }
 .cell .reading { position: absolute; top: 50%; right: calc(var(--cell) * .03); transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: upright; font-family: var(--font-ui); font-size: max(8px, calc(var(--cell) * .21)); color: var(--ok); line-height: 1; letter-spacing: 0; white-space: nowrap; }
 .cell .fix { position: absolute; top: 1px; right: 3px; font-size: calc(var(--cell) * .26); color: var(--red); font-family: var(--font-kai); }
 .cell.ok { color: var(--ink); }
@@ -118,6 +120,7 @@ td.num { font-size: .82rem; }
       <label class="ctl" for="order">順序
         <select id="order"><option value="seq">依序</option><option value="rand">隨機</option></select>
       </label>
+      <label class="ctl" for="readings"><input type="checkbox" id="readings"> 冷僻字注音</label>
     </div>
   </header>
 
@@ -170,7 +173,7 @@ const STORE_KEY = "zhuyin-typing-sheet-v1";
 const $ = (id) => document.getElementById(id);
 
 let history = [];
-let prefs = { set: "all", order: "seq" };
+let prefs = { set: "all", order: "seq", readings: true };
 try { const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (saved) { history = saved.history || []; Object.assign(prefs, saved.prefs || {}); } } catch (e) {}
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify({ history, prefs })); } catch (e) {} }
 
@@ -396,6 +399,7 @@ $("next").addEventListener("click", () => { if (!graded && typing.value.trim()) 
 $("skip").addEventListener("click", () => pick(1));
 $("set").addEventListener("change", (e) => { prefs.set = e.target.value; save(); current = null; pick(0); });
 $("order").addEventListener("change", (e) => { prefs.order = e.target.value; save(); });
+$("readings").addEventListener("change", (e) => { prefs.readings = e.target.checked; save(); $("sheet").classList.toggle("no-readings", !prefs.readings); typing.focus(); });
 let clearArmed = null;
 $("clear").addEventListener("click", () => {
   if (!clearArmed) { $("clear").textContent = "再按一次確認清除"; clearArmed = setTimeout(() => { clearArmed = null; $("clear").textContent = "清除所有紀錄"; }, 3000); return; }
@@ -406,5 +410,6 @@ $("clear").addEventListener("click", () => {
 // Start.
 if (!SETS.some(([v]) => v === prefs.set)) prefs.set = "all";
 $("set").value = prefs.set; $("order").value = prefs.order;
+$("readings").checked = prefs.readings; $("sheet").classList.toggle("no-readings", !prefs.readings);
 current = null; pick(0); renderStats();
 </script>

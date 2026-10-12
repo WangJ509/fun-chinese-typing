@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>注音打字稿紙</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +59,10 @@ button.danger { color: var(--red); border-color: var(--red); }
 .meta .cat { border: 1px solid var(--grid); color: var(--ok); padding: 0 8px; border-radius: 999px; }
 .legend { font-size: .72rem; letter-spacing: .12em; color: var(--muted); }
 /* Each column pairs a character of the original (top) with what was typed (bottom); columns wrap together, so every line of the original sits right above the typed line. */
-.grid { display: flex; flex-wrap: wrap; row-gap: 12px; padding-left: 1.5px; max-width: 100%; }
+.grid { display: flex; flex-wrap: wrap; padding-left: 1.5px; max-width: 100%; }
+/* Units never split: in prose a unit is a character with the punctuation after it, so no line starts with punctuation; in poems it is a whole phrase, so long lines wrap only after punctuation. */
+.unit { display: flex; margin-bottom: 12px; }
+.br { flex-basis: 100%; height: 0; }
 .col { display: flex; flex-direction: column; border: 1.5px solid var(--grid); margin-left: -1.5px; }
 .cell { width: var(--cell); height: var(--cell); position: relative; display: flex; align-items: center; justify-content: center; font-family: var(--font-kai); font-size: calc(var(--cell) * .62); line-height: 1; }
 .cell.typed { border-top: 1px dashed var(--grid); background: var(--paper); }
@@ -150,10 +154,17 @@ td.num { font-size: .82rem; }
 </div>
 
 <script>
-const TEXTS = [["poem-001","poem","classical","靜夜思","李白","床前明月光，疑是地上霜。舉頭望明月，低頭思故鄉。"],["poem-002","poem","classical","春曉","孟浩然","春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。"],["poem-003","poem","classical","登鸛雀樓","王之渙","白日依山盡，黃河入海流。欲窮千里目，更上一層樓。"],["poem-004","poem","classical","相思","王維","紅豆生南國，春來發幾枝。願君多採擷，此物最相思。"],["poem-005","poem","classical","鹿柴","王維","空山不見人，但聞人語響。返景入深林，復照青苔上。"],["poem-006","poem","classical","江雪","柳宗元","千山鳥飛絕，萬徑人蹤滅。孤舟蓑笠翁，獨釣寒江雪。"],["poem-007","poem","classical","回鄉偶書","賀知章","少小離家老大回，鄉音無改鬢毛衰。兒童相見不相識，笑問客從何處來。"],["poem-008","poem","classical","清明","杜牧","清明時節雨紛紛，路上行人欲斷魂。借問酒家何處有，牧童遙指杏花村。"],["poem-009","poem","classical","早發白帝城","李白","朝辭白帝彩雲間，千里江陵一日還。兩岸猿聲啼不住，輕舟已過萬重山。"],["poem-010","poem","classical","楓橋夜泊","張繼","月落烏啼霜滿天，江楓漁火對愁眠。姑蘇城外寒山寺，夜半鐘聲到客船。"],["poem-011","poem","classical","夜雨寄北","李商隱","君問歸期未有期，巴山夜雨漲秋池。何當共剪西窗燭，卻話巴山夜雨時。"],["poem-012","poem","classical","春望","杜甫","國破山河在，城春草木深。感時花濺淚，恨別鳥驚心。烽火連三月，家書抵萬金。白頭搔更短，渾欲不勝簪。"],["poem-013","poem","classical","如夢令","李清照","昨夜雨疏風驟，濃睡不消殘酒。試問捲簾人，卻道海棠依舊。知否？知否？應是綠肥紅瘦。"],["poem-014","poem","classical","水調歌頭","蘇軾","明月幾時有？把酒問青天。不知天上宮闕，今夕是何年。我欲乘風歸去，又恐瓊樓玉宇，高處不勝寒。起舞弄清影，何似在人間。"],["poem-015","poem","classical","水調歌頭","蘇軾","轉朱閣，低綺戶，照無眠。不應有恨，何事長向別時圓？人有悲歡離合，月有陰晴圓缺，此事古難全。但願人長久，千里共嬋娟。"],["poem-016","poem","modern","再別康橋","徐志摩","輕輕的我走了，正如我輕輕的來；我輕輕的招手，作別西天的雲彩。"],["poem-017","poem","modern","再別康橋","徐志摩","那河畔的金柳，是夕陽中的新娘；波光裡的豔影，在我的心頭蕩漾。"],["poem-018","poem","modern","再別康橋","徐志摩","軟泥上的青荇，油油的在水底招搖；在康河的柔波裡，我甘心做一條水草！"],["poem-019","poem","modern","再別康橋","徐志摩","那榆蔭下的一潭，不是清泉，是天上虹；揉碎在浮藻間，沉澱著彩虹似的夢。"],["poem-020","poem","modern","再別康橋","徐志摩","尋夢？撐一支長篙，向青草更青處漫溯；滿載一船星輝，在星輝斑斕裡放歌。"],["poem-021","poem","modern","再別康橋","徐志摩","但我不能放歌，悄悄是別離的笙簫；夏蟲也為我沉默，沉默是今晚的康橋！"],["poem-022","poem","modern","再別康橋","徐志摩","悄悄的我走了，正如我悄悄的來；我揮一揮衣袖，不帶走一片雲彩。"],["prose-001","prose","modern","匆匆","朱自清","燕子去了，有再來的時候；楊柳枯了，有再青的時候；桃花謝了，有再開的時候。"],["prose-002","prose","modern","匆匆","朱自清","但是，聰明的，你告訴我，我們的日子為什麼一去不復返呢？"],["prose-003","prose","modern","匆匆","朱自清","是有人偷了他們罷：那是誰？又藏在何處呢？是他們自己逃走了罷：現在又到了哪裡呢？"],["prose-004","prose","modern","匆匆","朱自清","我不知道他們給了我多少日子；但我的手確乎是漸漸空虛了。"],["prose-005","prose","modern","匆匆","朱自清","在默默裡算著，八千多日子已經從我手中溜去；像針尖上一滴水滴在大海裡，我的日子滴在時間的流裡，沒有聲音，也沒有影子。"],["prose-006","prose","modern","背影","朱自清","我與父親不相見已二年餘了，我最不能忘記的是他的背影。"],["prose-007","prose","modern","背影","朱自清","那年冬天，祖母死了，父親的差使也交卸了，正是禍不單行的日子。"],["prose-008","prose","modern","春","朱自清","盼望著，盼望著，東風來了，春天的腳步近了。"],["prose-009","prose","modern","春","朱自清","一切都像剛睡醒的樣子，欣欣然張開了眼。山朗潤起來了，水漲起來了，太陽的臉紅起來了。"],["prose-010","prose","modern","荷塘月色","朱自清","這幾天心裡頗不寧靜。今晚在院子裡坐著乘涼，忽然想起日日走過的荷塘，在這滿月的光裡，總該另有一番樣子吧。"],["prose-011","prose","classical","桃花源記","陶淵明","晉太元中，武陵人捕魚為業。緣溪行，忘路之遠近。"],["prose-012","prose","classical","桃花源記","陶淵明","忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛。漁人甚異之。復前行，欲窮其林。"],["prose-013","prose","classical","陋室銘","劉禹錫","山不在高，有仙則名。水不在深，有龍則靈。斯是陋室，惟吾德馨。苔痕上階綠，草色入簾青。"],["prose-014","prose","classical","陋室銘","劉禹錫","談笑有鴻儒，往來無白丁。可以調素琴，閱金經。無絲竹之亂耳，無案牘之勞形。南陽諸葛廬，西蜀子雲亭。孔子云：何陋之有？"],["prose-015","prose","classical","愛蓮說","周敦頤","水陸草木之花，可愛者甚蕃。晉陶淵明獨愛菊。自李唐來，世人甚愛牡丹。"],["prose-016","prose","classical","愛蓮說","周敦頤","予獨愛蓮之出淤泥而不染，濯清漣而不妖，中通外直，不蔓不枝，香遠益清，亭亭淨植，可遠觀而不可褻玩焉。"]];
+const TEXTS = [["poem-001","poem","classical","靜夜思","李白","床前明月光，/疑是地上霜。/舉頭望明月，/低頭思故鄉。"],["poem-002","poem","classical","春曉","孟浩然","春眠不覺曉，/處處聞啼鳥。/夜來風雨聲，/花落知多少。"],["poem-003","poem","classical","登鸛雀樓","王之渙","白日依山盡，/黃河入海流。/欲窮千里目，/更上一層樓。"],["poem-004","poem","classical","相思","王維","紅豆生南國，/春來發幾枝。/願君多採擷，/此物最相思。"],["poem-005","poem","classical","鹿柴","王維","空山不見人，/但聞人語響。/返景入深林，/復照青苔上。"],["poem-006","poem","classical","江雪","柳宗元","千山鳥飛絕，/萬徑人蹤滅。/孤舟蓑笠翁，/獨釣寒江雪。"],["poem-007","poem","classical","回鄉偶書","賀知章","少小離家老大回，/鄉音無改鬢毛衰。/兒童相見不相識，/笑問客從何處來。"],["poem-008","poem","classical","清明","杜牧","清明時節雨紛紛，/路上行人欲斷魂。/借問酒家何處有，/牧童遙指杏花村。"],["poem-009","poem","classical","早發白帝城","李白","朝辭白帝彩雲間，/千里江陵一日還。/兩岸猿聲啼不住，/輕舟已過萬重山。"],["poem-010","poem","classical","楓橋夜泊","張繼","月落烏啼霜滿天，/江楓漁火對愁眠。/姑蘇城外寒山寺，/夜半鐘聲到客船。"],["poem-011","poem","classical","夜雨寄北","李商隱","君問歸期未有期，/巴山夜雨漲秋池。/何當共剪西窗燭，/卻話巴山夜雨時。"],["poem-012","poem","classical","春望","杜甫","國破山河在，/城春草木深。/感時花濺淚，/恨別鳥驚心。/烽火連三月，/家書抵萬金。/白頭搔更短，/渾欲不勝簪。"],["poem-013","poem","classical","如夢令","李清照","昨夜雨疏風驟，/濃睡不消殘酒。/試問捲簾人，/卻道海棠依舊。/知否？知否？/應是綠肥紅瘦。"],["poem-014","poem","classical","水調歌頭","蘇軾","明月幾時有？把酒問青天。/不知天上宮闕，今夕是何年。/我欲乘風歸去，又恐瓊樓玉宇，高處不勝寒。/起舞弄清影，何似在人間。"],["poem-015","poem","classical","水調歌頭","蘇軾","轉朱閣，低綺戶，照無眠。/不應有恨，何事長向別時圓？/人有悲歡離合，月有陰晴圓缺，此事古難全。/但願人長久，千里共嬋娟。"],["poem-016","poem","modern","再別康橋","徐志摩","輕輕的我走了，/正如我輕輕的來；/我輕輕的招手，/作別西天的雲彩。"],["poem-017","poem","modern","再別康橋","徐志摩","那河畔的金柳，/是夕陽中的新娘；/波光裡的豔影，/在我的心頭蕩漾。"],["poem-018","poem","modern","再別康橋","徐志摩","軟泥上的青荇，/油油的在水底招搖；/在康河的柔波裡，/我甘心做一條水草！"],["poem-019","poem","modern","再別康橋","徐志摩","那榆蔭下的一潭，/不是清泉，是天上虹；/揉碎在浮藻間，/沉澱著彩虹似的夢。"],["poem-020","poem","modern","再別康橋","徐志摩","尋夢？撐一支長篙，/向青草更青處漫溯；/滿載一船星輝，/在星輝斑斕裡放歌。"],["poem-021","poem","modern","再別康橋","徐志摩","但我不能放歌，/悄悄是別離的笙簫；/夏蟲也為我沉默，/沉默是今晚的康橋！"],["poem-022","poem","modern","再別康橋","徐志摩","悄悄的我走了，/正如我悄悄的來；/我揮一揮衣袖，/不帶走一片雲彩。"],["prose-001","prose","modern","匆匆","朱自清","燕子去了，有再來的時候；楊柳枯了，有再青的時候；桃花謝了，有再開的時候。"],["prose-002","prose","modern","匆匆","朱自清","但是，聰明的，你告訴我，我們的日子為什麼一去不復返呢？"],["prose-003","prose","modern","匆匆","朱自清","是有人偷了他們罷：那是誰？又藏在何處呢？是他們自己逃走了罷：現在又到了哪裡呢？"],["prose-004","prose","modern","匆匆","朱自清","我不知道他們給了我多少日子；但我的手確乎是漸漸空虛了。"],["prose-005","prose","modern","匆匆","朱自清","在默默裡算著，八千多日子已經從我手中溜去；像針尖上一滴水滴在大海裡，我的日子滴在時間的流裡，沒有聲音，也沒有影子。"],["prose-006","prose","modern","背影","朱自清","我與父親不相見已二年餘了，我最不能忘記的是他的背影。"],["prose-007","prose","modern","背影","朱自清","那年冬天，祖母死了，父親的差使也交卸了，正是禍不單行的日子。"],["prose-008","prose","modern","春","朱自清","盼望著，盼望著，東風來了，春天的腳步近了。"],["prose-009","prose","modern","春","朱自清","一切都像剛睡醒的樣子，欣欣然張開了眼。山朗潤起來了，水漲起來了，太陽的臉紅起來了。"],["prose-010","prose","modern","荷塘月色","朱自清","這幾天心裡頗不寧靜。今晚在院子裡坐著乘涼，忽然想起日日走過的荷塘，在這滿月的光裡，總該另有一番樣子吧。"],["prose-011","prose","classical","桃花源記","陶淵明","晉太元中，武陵人捕魚為業。緣溪行，忘路之遠近。"],["prose-012","prose","classical","桃花源記","陶淵明","忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛。漁人甚異之。復前行，欲窮其林。"],["prose-013","prose","classical","陋室銘","劉禹錫","山不在高，有仙則名。水不在深，有龍則靈。斯是陋室，惟吾德馨。苔痕上階綠，草色入簾青。"],["prose-014","prose","classical","陋室銘","劉禹錫","談笑有鴻儒，往來無白丁。可以調素琴，閱金經。無絲竹之亂耳，無案牘之勞形。南陽諸葛廬，西蜀子雲亭。孔子云：何陋之有？"],["prose-015","prose","classical","愛蓮說","周敦頤","水陸草木之花，可愛者甚蕃。晉陶淵明獨愛菊。自李唐來，世人甚愛牡丹。"],["prose-016","prose","classical","愛蓮說","周敦頤","予獨愛蓮之出淤泥而不染，濯清漣而不妖，中通外直，不蔓不枝，香遠益清，亭亭淨植，可遠觀而不可褻玩焉。"]];
 // Poems and prose from texts.tsv.
 const LIT_NAMES = { "classical-poem": "古典詩詞", "modern-poem": "現代詩", "classical-prose": "古文", "modern-prose": "現代散文" };
-const LIT_PASSAGES = TEXTS.map(([id, kind, era, title, author, text]) => ({ id, cat: `${era}-${kind}`, title, author, answers: [text] }));
+// "/" marks the original line breaks of a poem; breaks holds the index of the character each new line starts with.
+const LIT_PASSAGES = TEXTS.map(([id, kind, era, title, author, text]) => {
+  const lines = text.split("/"), breaks = new Set();
+  let n = 0;
+  for (const line of lines.slice(0, -1)) { n += Array.from(line).length; breaks.add(n); }
+  return { id, cat: `${era}-${kind}`, title, author, answers: [lines.join("")], breaks };
+});
+const PUNCTUATION = /^[，。、；：？！」』）…—]$/;
 const STORE_KEY = "zhuyin-typing-sheet-v1";
 const $ = (id) => document.getElementById(id);
 
@@ -233,24 +244,36 @@ function renderMeta() {
 // Draws original/typed column pairs. Without a final result, grades the committed text, shows the composition still being typed after it, and moves the input to the caret.
 function renderPairs(text, result, preedit = "", caretAt = Array.from(preedit).length) {
   const box = $("pairs"); box.replaceChildren();
-  const col = (top, bottom, cls, fix) => { const c = document.createElement("div"); c.className = "col"; const b = cell(bottom, "typed" + (cls ? " " + cls : ""), fix); c.append(cell(top, ""), b); box.appendChild(c); return b; };
-  let r = null, rest = Array.from(current.answers[0]);
+  let unit = null, unitClosed = false;
+  const phrases = current.cat.endsWith("-poem");
+  // ai is the column's index in the original, or -1 for a column outside it.
+  const col = (top, bottom, cls, fix, ai = -1) => {
+    const c = document.createElement("div"); c.className = "col";
+    const b = cell(bottom, "typed" + (cls ? " " + cls : ""), fix); c.append(cell(top, ""), b);
+    if (current.breaks.has(ai)) { const br = document.createElement("div"); br.className = "br"; box.appendChild(br); unit = null; }
+    const punct = PUNCTUATION.test(top);
+    if (!unit || (phrases ? unitClosed && !punct : !punct)) { unit = document.createElement("div"); unit.className = "unit"; box.appendChild(unit); }
+    unit.appendChild(c);
+    unitClosed = punct;
+    return b;
+  };
+  let r = null, rest = Array.from(current.answers[0]), restStart = 0;
   if (text.trim()) {
     r = result || gradePrefix(current, text);
     const typedChars = Array.from(text.trim()), ansChars = Array.from(r.answer);
     for (const [op, ai, ti] of r.ops) {
-      if (op === "ok") col(ansChars[ai], typedChars[ti], "ok");
-      else if (op === "sub") col(ansChars[ai], typedChars[ti], "wrong");
+      if (op === "ok") col(ansChars[ai], typedChars[ti], "ok", "", ai);
+      else if (op === "sub") col(ansChars[ai], typedChars[ti], "wrong", "", ai);
       else if (op === "ins") col("", typedChars[ti], "wrong", "刪");
-      else col(ansChars[ai], "", "missing");
+      else col(ansChars[ai], "", "missing", "", ai);
     }
-    rest = ansChars.slice(r.done);
+    rest = ansChars.slice(r.done); restStart = r.done;
   }
   if (result) return r;
   const pre = Array.from(preedit);
   let caret = null;
   for (let i = 0; i < Math.max(rest.length, pre.length + 1); i++) {
-    const b = col(rest[i] || "", pre[i] || "", i < pre.length ? "composing" : "");
+    const b = col(rest[i] || "", pre[i] || "", i < pre.length ? "composing" : "", "", i < rest.length ? restStart + i : -1);
     if (i === caretAt) caret = b;
   }
   caret.classList.add("caret");
